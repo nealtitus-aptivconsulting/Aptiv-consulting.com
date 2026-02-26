@@ -10,6 +10,7 @@
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{background:var(--black);color:var(--white);font-family:'Raleway',sans-serif;font-weight:300;overflow-x:hidden;}
+  
   body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(201,146,42,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,146,42,.03) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;}
   header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:24px 60px;background:linear-gradient(to bottom,rgba(8,8,8,.98),transparent);transition:all .3s;}
   header.scrolled{background:rgba(8,8,8,.97);border-bottom:1px solid var(--border);padding:16px 60px;}
@@ -206,7 +207,7 @@
   @keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
   @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
-  .reveal{opacity:0;transform:translateY(32px);transition:opacity .8s ease,transform .8s ease;}
+  .reveal{opacity:1;transform:translateY(0);transition:opacity .8s ease,transform .8s ease;}
   .reveal.visible{opacity:1;transform:translateY(0);}
   .reveal-delay-1{transition-delay:.1s;}
   .reveal-delay-2{transition-delay:.2s;}
@@ -229,6 +230,9 @@
 </head>
 <body>
 
+
+  <div class="cursor-dot" id="cursorDot"></div>
+</div>
 
 <!-- ══════ INTAKE MODAL ══════ -->
 <div class="modal-overlay" id="intakeModal">
@@ -539,7 +543,7 @@
         <div class="alpha-price reveal reveal-delay-2">
           <span class="price-currency">R</span>
           <span class="price-amount">1,500</span>
-          <div><span class="price-period">once off</span><br><span class="price-note">All Deliverables Included · Limited Slots</span></div>
+          <div><span class="price-period">/ month</span><br><span class="price-note">Alpha 10 Founding Rate · Limited Slots</span></div>
         </div>
         <button class="btn-primary reveal reveal-delay-3" onclick="openModal()"><span>Apply for Alpha 10</span><span>-></span></button>
       </div>
@@ -594,7 +598,7 @@
         <button class="btn-primary" onclick="openModal()"><span>Book a Discovery Call</span><span>-></span></button>
         <button class="btn-secondary" onclick="openModal()">Apply for Alpha 10 <span>-></span></button>
       </div>
-      <span class="contact-email reveal reveal-delay-3">Email: <a href="/cdn-cgi/l/email-protection#92fcf7f3fee6fbe6e7e1d2f3e2e6fbe4f1fdfce1e7fee6fbfcf5bcf1fdff"><span class="__cf_email__" data-cfemail="f49a919598809d808187b49584809d82979b9a878198809d9a93da979b99">[email&#160;protected]</span></a> &nbsp;·&nbsp; WhatsApp: <a href="https://wa.me/27670062765?text=Hi%20Neal%2C%20I%20found%20Aptiv%20Consulting%20and%20would%20like%20to%20enquire%20about%20your%20services." target="_blank" rel="noopener">067 006 2765</a></span>
+      <span class="contact-email reveal reveal-delay-3">Email: <a href="mailto:nealtitus@aptivconsulting.com">nealtitus@aptivconsulting.com</a> &nbsp;·&nbsp; WhatsApp: <a href="https://wa.me/27670062765" target="_blank" rel="noopener">067 006 2765</a></span>
     </div>
   </div>
 </section>
@@ -629,21 +633,20 @@
     <div class="footer-col">
       <h4>Connect</h4>
       <ul>
-        <li><a href="/cdn-cgi/l/email-protection#e58b808489918c919096a58495918c93868a8b969089918c8b82cb868a88da9690878f808691d8a08b94908c979cc0d7d5c8c0d7d5a495918c93c0d7d5a68a8b969089918c8b82">Email Us</a></li>
+        <li><a href="mailto:nealtitus@aptivconsulting.com">Email Us</a></li>
         <li><a href="https://www.linkedin.com/company/aptiv-consulting" target="_blank" rel="noopener">LinkedIn</a></li>
-        <li><a href="https://wa.me/27670062765?text=Hi%20Neal%2C%20I%20found%20Aptiv%20Consulting%20and%20would%20like%20to%20enquire%20about%20your%20services." target="_blank" rel="noopener">WhatsApp</a></li>
+        <li><a href="https://wa.me/27670062765" target="_blank" rel="noopener">WhatsApp</a></li>
         <li><a href="#" onclick="openModal();return false;">Book a Call</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
-    <p>© 2025 Aptiv Consulting · Johannesburg, South Africa · <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0b656e6a677f627f7e784b6a7b7f627d686465787e677f62656c25686466">[email&#160;protected]</a></span></p>
+    <p>© 2025 Aptiv Consulting · Johannesburg, South Africa · <span><a href="mailto:nealtitus@aptivconsulting.com">nealtitus@aptivconsulting.com</a></span></p>
     <p style="font-size:11px;color:var(--grey);">Architectural Rigor. Not Motivational Advice.</p>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-
+<script>
 /* Header scroll */
 window.addEventListener('scroll',function(){
   document.getElementById('header').classList.toggle('scrolled',window.scrollY>60);
@@ -826,10 +829,9 @@ function submitForm(type){
   var noNext=document.createElement('input');
   noNext.type='hidden'; noNext.name='_next'; noNext.value=window.location.href+'?submitted=1';
   form.appendChild(noNext);
-
-  var ccField=document.createElement('input');
-  ccField.type='hidden'; ccField.name='_cc'; ccField.value='nealtitus@aptivconsulting.com';
-  form.appendChild(ccField);
+  var ccF=document.createElement('input');
+  ccF.type='hidden'; ccF.name='_cc'; ccF.value='nealtitus@aptivconsulting.com';
+  form.appendChild(ccF);
 
   for(var key in fields){
     var inp=document.createElement('input');
@@ -851,14 +853,13 @@ function showSuccess(){
 }
 
 /* Expose to global scope for inline onclick */
-window.ope/* Expose to global scope for inline onclick */
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.startForm = startForm;
-window.nvNav = nvNav;
-window.exNav = exNav;
-window.submitForm = submitForm;
-window.showSuccess = showSuccess;
+window.openModal=openModal;
+window.closeModal=closeModal;
+window.selectType=selectType;
+window.startForm=startForm;
+window.nvNav=nvNav;
+window.exNav=exNav;
+window.submitForm=submitForm;
 </script>
 </body>
 </html>
