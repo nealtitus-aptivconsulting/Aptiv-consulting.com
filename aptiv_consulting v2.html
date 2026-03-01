@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aptiv Consulting | Architectural Rigor. Not Motivational Advice.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--black:#080808;--black-mid:#111111;--black-soft:#1a1a1a;--gold:#C9922A;--gold-light:#E8B84B;--white:#F5F0E8;--grey:#888880;--border:rgba(201,146,42,0.2);}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--black);color:var(--white);font-family:'Raleway',sans-serif;font-weight:300;overflow-x:hidden;cursor:none;}
+  .cursor{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;}
+  .cursor-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;transform:translate(-50%,-50%);}
+  .cursor-ring{width:32px;height:32px;border:1px solid rgba(201,146,42,.5);border-radius:50%;transform:translate(-50%,-50%);transition:all .15s ease;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(201,146,42,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,146,42,.03) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;}
+  header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:24px 60px;background:linear-gradient(to bottom,rgba(8,8,8,.98),transparent);transition:all .3s;}
+  header.scrolled{background:rgba(8,8,8,.97);border-bottom:1px solid var(--border);padding:16px 60px;}
+  .logo{display:flex;align-items:center;gap:14px;text-decoration:none;}
+  .logo-mark{width:38px;height:38px;border:1px solid var(--gold);display:grid;place-items:center;position:relative;}
+  .logo-mark::before{content:'';position:absolute;inset:4px;border:1px solid rgba(201,146,42,.4);}
+  .logo-mark span{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);}
+  .logo-text .brand{font-family:'Raleway',sans-serif;font-size:13px;font-weight:700;letter-spacing:.25em;color:var(--white);display:block;}
+  .logo-text .tagline{font-size:9px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;display:block;}
+  nav{display:flex;align-items:center;gap:40px;}
+  nav a{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);text-decoration:none;transition:color .3s;position:relative;}
+  nav a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
+  nav a:hover{color:var(--white);}
+  nav a:hover::after{width:100%;}
+  .nav-cta{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--black);background:var(--gold);padding:10px 24px;border:none;cursor:pointer;transition:background .3s;}
+  .nav-cta:hover{background:var(--gold-light);}
+  #hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:0 60px;overflow:hidden;}
+  .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 70% 50%,rgba(201,146,42,.06) 0%,transparent 70%);}
+  .hero-lines{position:absolute;right:0;top:0;bottom:0;width:50%;overflow:hidden;opacity:.12;}
+  .hero-lines svg{width:100%;height:100%;}
+  .hero-content{position:relative;z-index:2;max-width:720px;}
+  .hero-eyebrow{display:flex;align-items:center;gap:16px;margin-bottom:40px;opacity:0;transform:translateY(20px);animation:fadeUp .8s .3s forwards;}
+  .hero-eyebrow span{font-size:10px;font-weight:600;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);}
+  .eyebrow-line{width:60px;height:1px;background:var(--gold);}
+  h1{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,7vw,96px);font-weight:300;line-height:1.0;color:var(--white);margin-bottom:32px;opacity:0;transform:translateY(30px);animation:fadeUp .9s .5s forwards;}
+  h1 em{font-style:italic;color:var(--gold-light);}
+  .hero-sub{font-size:14px;line-height:1.9;color:var(--grey);max-width:520px;margin-bottom:56px;opacity:0;transform:translateY(20px);animation:fadeUp .8s .7s forwards;}
+  .hero-actions{display:flex;align-items:center;gap:32px;opacity:0;transform:translateY(20px);animation:fadeUp .8s .9s forwards;}
+  .btn-primary{display:inline-flex;align-items:center;gap:12px;padding:16px 40px;background:var(--gold);color:var(--black);font-family:'Raleway',sans-serif;font-size:11px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:background .3s;position:relative;overflow:hidden;}
+  .btn-primary::before{content:'';position:absolute;inset:0;background:var(--gold-light);transform:translateX(-100%);transition:transform .4s;}
+  .btn-primary:hover::before{transform:translateX(0);}
+  .btn-primary span{position:relative;z-index:1;}
+  .btn-secondary{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .3s;background:none;border:none;cursor:pointer;}
+  .btn-secondary:hover{color:var(--white);}
+  .hero-stats{position:absolute;bottom:60px;right:60px;display:flex;gap:48px;opacity:0;animation:fadeUp .8s 1.1s forwards;}
+  .stat{text-align:right;}
+  .stat-number{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--gold-light);line-height:1;}
+  .stat-label{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:4px;}
+  .marquee-strip{background:var(--gold);padding:14px 0;overflow:hidden;}
+  .marquee-track{display:flex;animation:marquee 20s linear infinite;width:max-content;}
+  .marquee-item{display:flex;align-items:center;gap:32px;padding:0 32px;font-size:10px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--black);white-space:nowrap;}
+  .marquee-dot{width:4px;height:4px;background:rgba(8,8,8,.4);border-radius:50%;}
+  section{position:relative;z-index:1;}
+  .section-inner{max-width:1200px;margin:0 auto;padding:0 60px;}
+  .section-label{display:flex;align-items:center;gap:16px;margin-bottom:64px;}
+  .section-label span{font-size:10px;font-weight:600;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);}
+  .section-label .line{flex:1;height:1px;background:var(--border);}
+  h2{font-family:'Cormorant Garamond',serif;font-weight:300;line-height:1.1;color:var(--white);}
+  #about{padding:140px 0;}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;}
+  .about-left h2{font-size:clamp(40px,4.5vw,64px);margin-bottom:32px;}
+  .about-left h2 em,.services-header h2 em,#contact h2 em,.alpha-left h2 em,.testimonials-header h2 em{color:var(--gold-light);font-style:italic;}
+  .about-desc{font-size:14px;line-height:1.9;color:var(--grey);margin-bottom:20px;}
+  .about-desc strong{color:var(--white);font-weight:500;}
+  .about-signature{margin-top:48px;padding-top:32px;border-top:1px solid var(--border);display:flex;align-items:center;gap:20px;}
+  .sig-mark{width:48px;height:48px;border:1px solid var(--gold);display:grid;place-items:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);}
+  .sig-name{color:var(--white);font-weight:500;font-size:12px;}
+  .sig-role{color:var(--grey);font-size:11px;letter-spacing:.1em;}
+  .about-right{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+  .pillar{background:var(--black-soft);padding:40px 32px;border:1px solid transparent;transition:border-color .3s;}
+  .pillar:hover{border-color:var(--border);}
+  .pillar-num{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--gold);letter-spacing:.2em;margin-bottom:20px;}
+  .pillar-title{font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--white);margin-bottom:12px;}
+  .pillar-desc{font-size:12px;line-height:1.7;color:var(--grey);}
+  #services{padding:140px 0;background:var(--black-mid);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .services-header{display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-bottom:80px;align-items:end;}
+  .services-header h2{font-size:clamp(40px,4.5vw,64px);}
+  .services-intro{font-size:14px;line-height:1.9;color:var(--grey);}
+  .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+  .service-card{background:var(--black);padding:56px 40px;position:relative;overflow:hidden;border:1px solid transparent;transition:border-color .4s;cursor:pointer;}
+  .service-card::before{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--gold);transition:width .4s;}
+  .service-card:hover{border-color:var(--border);}
+  .service-card:hover::before{width:100%;}
+  .service-icon{width:52px;height:52px;border:1px solid var(--border);display:grid;place-items:center;margin-bottom:32px;transition:border-color .3s;}
+  .service-card:hover .service-icon{border-color:var(--gold);}
+  .service-icon svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:1.5;}
+  .service-num{position:absolute;top:40px;right:40px;font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:rgba(201,146,42,.07);line-height:1;}
+  .service-title{font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--white);margin-bottom:16px;}
+  .service-desc{font-size:13px;line-height:1.8;color:var(--grey);margin-bottom:24px;}
+  .service-link{font-size:10px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:8px;transition:gap .3s;}
+  .service-card:hover .service-link{gap:14px;}
+  #alpha{padding:140px 0;}
+  .alpha-inner{display:grid;grid-template-columns:1fr 1.2fr;gap:100px;align-items:center;}
+  .alpha-badge{display:inline-flex;align-items:center;gap:12px;border:1px solid var(--gold);padding:8px 20px;margin-bottom:40px;}
+  .alpha-badge span{font-size:9px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);}
+  .alpha-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite;}
+  .alpha-left h2{font-size:clamp(36px,4vw,58px);margin-bottom:24px;}
+  .alpha-left p{font-size:14px;line-height:1.9;color:var(--grey);margin-bottom:16px;}
+  .alpha-price{margin:40px 0;padding:32px;border:1px solid var(--border);display:flex;align-items:baseline;gap:8px;}
+  .price-currency{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);}
+  .price-amount{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;color:var(--white);line-height:1;}
+  .price-period{font-size:12px;color:var(--grey);align-self:center;}
+  .price-note{font-size:11px;color:var(--grey);letter-spacing:.1em;}
+  .alpha-right{background:var(--black-soft);padding:56px;border:1px solid var(--border);position:relative;}
+  .alpha-right::before{content:'α10';position:absolute;top:32px;right:40px;font-family:'Cormorant Garamond',serif;font-size:80px;font-weight:300;color:rgba(201,146,42,.06);line-height:1;}
+  .deliverable{display:flex;gap:20px;padding:24px 0;border-bottom:1px solid rgba(201,146,42,.1);}
+  .deliverable:last-of-type{border-bottom:none;}
+  .del-check{width:20px;height:20px;flex-shrink:0;border:1px solid var(--gold);display:grid;place-items:center;margin-top:2px;}
+  .del-check::after{content:'';width:8px;height:5px;border-left:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold);transform:rotate(-45deg) translateY(-1px);}
+  .del-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:4px;}
+  .del-desc{font-size:12px;line-height:1.6;color:var(--grey);}
+  #testimonials{padding:140px 0;background:var(--black-mid);border-top:1px solid var(--border);}
+  .testimonials-header{text-align:center;margin-bottom:80px;}
+  .testimonials-header h2{font-size:clamp(40px,4.5vw,64px);margin-bottom:16px;}
+  .testimonials-header p{font-size:14px;color:var(--grey);}
+  .testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+  .testimonial-card{background:var(--black);padding:48px 40px;border:1px solid transparent;transition:border-color .3s;}
+  .testimonial-card:hover,.testimonial-card.featured{border-color:var(--border);}
+  .testimonial-card.featured{background:var(--black-soft);}
+  .quote-mark{font-family:'Cormorant Garamond',serif;font-size:80px;line-height:.6;color:var(--gold);opacity:.3;margin-bottom:24px;display:block;}
+  .testimonial-text{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;font-style:italic;line-height:1.7;color:var(--white);margin-bottom:36px;}
+  .testimonial-author{display:flex;align-items:center;gap:16px;padding-top:24px;border-top:1px solid var(--border);}
+  .author-avatar{width:40px;height:40px;border:1px solid var(--gold);display:grid;place-items:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold);flex-shrink:0;}
+  .author-name{font-size:13px;font-weight:600;color:var(--white);}
+  .author-title{font-size:11px;color:var(--grey);margin-top:2px;}
+  .stars{color:var(--gold);font-size:12px;letter-spacing:2px;margin-bottom:20px;}
+  #contact{padding:140px 0;text-align:center;position:relative;overflow:hidden;}
+  #contact::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(201,146,42,.05) 0%,transparent 70%);}
+  .contact-inner{position:relative;z-index:1;}
+  #contact h2{font-size:clamp(44px,5vw,76px);margin-bottom:24px;}
+  #contact p{font-size:15px;line-height:1.8;color:var(--grey);max-width:560px;margin:0 auto 56px;}
+  .contact-actions{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
+  .contact-email{font-size:12px;letter-spacing:.15em;color:var(--grey);margin-top:40px;display:block;}
+  .contact-email a{color:var(--gold);text-decoration:none;}
+  footer{background:var(--black-mid);border-top:1px solid var(--border);padding:80px 60px 40px;}
+  .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:64px;}
+  .footer-brand p{font-size:13px;line-height:1.8;color:var(--grey);max-width:280px;margin-top:20px;}
+  .footer-col h4{font-size:10px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+  .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:12px;}
+  .footer-col ul li a{font-size:13px;color:var(--grey);text-decoration:none;transition:color .3s;display:flex;align-items:center;gap:8px;}
+  .footer-col ul li a::before{content:'';width:0;height:1px;background:var(--gold);transition:width .3s;flex-shrink:0;}
+  .footer-col ul li a:hover{color:var(--white);}
+  .footer-col ul li a:hover::before{width:16px;}
+  .footer-bottom{padding-top:32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .footer-bottom p{font-size:11px;color:var(--grey);letter-spacing:.1em;}
+  .footer-bottom span{color:var(--gold);}
+
+  /* ══ MODAL ══ */
+  .modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(4,4,4,.96);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .4s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--black-mid);border:1px solid var(--border);max-width:780px;width:100%;margin:40px 20px;position:relative;}
+  .modal-close{position:absolute;top:20px;right:20px;background:none;border:1px solid transparent;color:var(--grey);font-size:18px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1;}
+  .modal-close:hover{color:var(--gold);border-color:var(--border);}
+  .modal-header{padding:48px 56px 32px;border-bottom:1px solid var(--border);}
+  .modal-eyebrow{font-size:10px;font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+  .modal-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--white);margin-bottom:8px;}
+  .modal-subtitle{font-size:13px;color:var(--grey);line-height:1.6;}
+  .modal-subtitle strong{color:var(--white);}
+  .type-selector{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:32px 56px 0;}
+  .type-btn{padding:24px 20px;background:var(--black);border:1px solid var(--border);cursor:pointer;text-align:left;transition:all .3s;position:relative;}
+  .type-btn.active{border-color:var(--gold);background:var(--black-soft);}
+  .type-icon{font-size:22px;margin-bottom:12px;display:block;}
+  .type-title{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--white);margin-bottom:6px;display:block;}
+  .type-btn.active .type-title{color:var(--gold);}
+  .type-desc{font-size:11px;color:var(--grey);line-height:1.5;display:block;}
+  .type-indicator{position:absolute;top:16px;right:16px;width:16px;height:16px;border:1px solid var(--border);border-radius:50%;transition:all .3s;}
+  .type-btn.active .type-indicator{border-color:var(--gold);background:var(--gold);}
+  .type-cta{padding:24px 56px 40px;}
+  .form-body{padding:0 56px 56px;display:none;}
+  .form-body.visible{display:block;}
+  .progress-label{font-size:10px;color:var(--grey);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px;padding-top:32px;}
+  .form-progress{display:flex;align-items:center;gap:6px;margin-bottom:40px;}
+  .progress-step{flex:1;height:2px;background:rgba(201,146,42,.15);transition:background .4s;}
+  .progress-step.done{background:var(--gold);}
+  .form-section{display:none;}
+  .form-section.active{display:block;}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--white);margin-bottom:6px;}
+  .section-hint{font-size:12px;color:var(--grey);margin-bottom:32px;line-height:1.7;font-style:italic;}
+  .field{margin-bottom:26px;}
+  .field label{display:block;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+  .field-hint{font-size:11px;color:var(--grey);margin-bottom:8px;font-style:italic;}
+  .field input,.field textarea,.field select{width:100%;background:var(--black);border:1px solid var(--border);color:var(--white);font-family:'Raleway',sans-serif;font-size:13px;font-weight:300;padding:13px 16px;outline:none;transition:border-color .3s;resize:vertical;-webkit-appearance:none;}
+  .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold);}
+  .field input::placeholder,.field textarea::placeholder{color:rgba(136,136,128,.45);}
+  .field textarea{min-height:90px;}
+  .field select option{background:var(--black-mid);color:var(--white);}
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-nav{display:flex;align-items:center;justify-content:space-between;margin-top:36px;padding-top:28px;border-top:1px solid var(--border);}
+  .btn-back{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);background:none;border:none;cursor:pointer;transition:color .3s;display:flex;align-items:center;gap:8px;}
+  .btn-back:hover{color:var(--white);}
+  .btn-submit{display:inline-flex;align-items:center;gap:10px;padding:13px 32px;background:var(--gold);color:var(--black);font-family:'Raleway',sans-serif;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:none;cursor:pointer;position:relative;overflow:hidden;transition:background .3s;}
+  .btn-submit::before{content:'';position:absolute;inset:0;background:var(--gold-light);transform:translateX(-100%);transition:transform .4s;}
+  .btn-submit:hover::before{transform:translateX(0);}
+  .btn-submit span{position:relative;z-index:1;}
+  .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+  .privacy-note{background:var(--black);border:1px solid var(--border);padding:18px;margin-bottom:24px;font-size:11px;color:var(--grey);line-height:1.7;}
+  .privacy-note strong{color:var(--white);}
+  .form-success{display:none;text-align:center;padding:80px 56px;}
+  .form-success.visible{display:block;}
+  .success-icon{width:64px;height:64px;border:1px solid var(--gold);display:grid;place-items:center;margin:0 auto 32px;font-size:28px;}
+  .success-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--white);margin-bottom:16px;}
+  .success-text{font-size:14px;color:var(--grey);line-height:1.8;max-width:440px;margin:0 auto 40px;}
+
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+  @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+  .reveal{opacity:0;transform:translateY(32px);transition:opacity .8s ease,transform .8s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  .reveal-delay-1{transition-delay:.1s;}
+  .reveal-delay-2{transition-delay:.2s;}
+  .reveal-delay-3{transition-delay:.3s;}
+
+  @media(max-width:900px){
+    header{padding:20px 24px;}header.scrolled{padding:14px 24px;}nav{display:none;}
+    #hero{padding:120px 24px 80px;}
+    .hero-stats{position:relative;bottom:auto;right:auto;margin-top:60px;justify-content:flex-start;gap:32px;}
+    .about-grid,.alpha-inner,.services-header,.footer-grid{grid-template-columns:1fr;gap:48px;}
+    .section-inner{padding:0 24px;}footer{padding:60px 24px 32px;}
+    .testimonials-grid,.services-grid{grid-template-columns:1fr;}
+    .about-right{grid-template-columns:1fr 1fr;}
+    .footer-grid{grid-template-columns:1fr 1fr;}
+    .modal-header,.form-body,.type-selector,.type-cta{padding-left:24px;padding-right:24px;}
+    .field-grid,.type-selector{grid-template-columns:1fr;}
+    .form-success{padding:48px 24px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+</div>
+
+<!-- ══════ INTAKE MODAL ══════ -->
+<div class="modal-overlay" id="intakeModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <div class="modal-header">
+      <div class="modal-eyebrow">Aptiv Consulting · Client Intake</div>
+      <div class="modal-title">Start Your Blueprint</div>
+      <p class="modal-subtitle">This takes <strong>10–15 minutes</strong> and is the first step to your strategic blueprint. All responses are <strong>POPIA-compliant and confidential</strong>.</p>
+    </div>
+
+    <!-- Type selection -->
+    <div id="stepType">
+      <div class="type-selector">
+        <button class="type-btn active" id="btnNewVenture" onclick="selectType('new')">
+          <div class="type-indicator"></div>
+          <span class="type-icon">🏗️</span>
+          <span class="type-title">New Venture</span>
+          <span class="type-desc">I have a business idea I want to turn into a structured, funded roadmap.</span>
+        </button>
+        <button class="type-btn" id="btnExisting" onclick="selectType('existing')">
+          <div class="type-indicator"></div>
+          <span class="type-icon">📈</span>
+          <span class="type-title">Existing Business</span>
+          <span class="type-desc">I have an operating business and need help to pivot, scale, or attract funding.</span>
+        </button>
+      </div>
+      <div class="type-cta">
+        <button class="btn-submit" onclick="startForm()" style="width:100%;justify-content:center;"><span>Continue</span><span>-></span></button>
+      </div>
+    </div>
+
+    <!-- NEW VENTURE FORM -->
+    <div class="form-body" id="formNewVenture">
+      <div class="progress-label" id="nvProgressLabel">Section 1 of 6</div>
+      <div class="form-progress" id="nvProgressBar"></div>
+
+      <div class="form-section active" id="nv-s1">
+        <div class="section-title">About You</div>
+        <div class="section-hint">We build architecture around people, not just ideas.</div>
+        <div class="field"><label>Full Name *</label><input id="nv-name" placeholder="Jane Smith" required /></div>
+        <div class="field"><label>Email Address *</label><div class="field-hint">Your blueprint summary will be sent here.</div><input type="email" id="nv-email" placeholder="jane@yourbusiness.com" required /></div>
+        <div class="field"><label>Current Profession</label><input id="nv-profession" placeholder="e.g. HR Manager, Teacher, Engineer" /></div>
+        <div class="field"><label>LinkedIn Profile (Optional)</label><input type="url" id="nv-linkedin" placeholder="https://linkedin.com/in/yourname" /></div>
+        <div class="field"><label>Have you started a business before?</label><div class="field-hint">If yes — what happened? If no — what's stopped you so far?</div><textarea id="nv-experience" placeholder="e.g. I ran a cleaning business for 2 years but couldn't scale. / I've never started one — I didn't know where to begin."></textarea></div>
+        <div class="form-nav"><span></span><button class="btn-submit" onclick="nvNav(1,'forward')"><span>Next: Your Idea</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="nv-s2">
+        <div class="section-title">Your Business Idea</div>
+        <div class="section-hint">Explain it simply — as if you're telling a 10-year-old. No jargon required.</div>
+        <div class="field"><label>What are you building? *</label><div class="field-hint">2–3 sentences. What does it do, who is it for, and why does it exist?</div><textarea id="nv-pitch" placeholder="e.g. I'm building an app that helps small restaurants track food waste so they reduce costs and qualify for green certifications. It targets restaurants with 5–20 staff who are losing money without realising it." required></textarea></div>
+        <div class="field"><label>What problem does it solve — and what does that problem cost? *</label><div class="field-hint">How much does this cost your target customer in Rands per month, or hours per week? Be specific.</div><textarea id="nv-pain" placeholder="e.g. Restaurant owners waste R8,000–R15,000/month on food they throw away because they have no tracking system. They also spend 6+ hours a week doing manual stock counts." required></textarea></div>
+        <div class="field"><label>Who exactly is this for? *</label><div class="field-hint">Not 'small businesses' — think location, size, industry, specific situation.</div><input id="nv-target" placeholder="e.g. Johannesburg-based restaurant owners with 5–20 staff, turnover under R2M/year" required /></div>
+        <div class="form-nav"><button class="btn-back" onclick="nvNav(2,'back')">← Back</button><button class="btn-submit" onclick="nvNav(2,'forward')"><span>Next: The Market</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="nv-s3">
+        <div class="section-title">The Market Landscape</div>
+        <div class="section-hint">How does the world solve this problem today — without you?</div>
+        <div class="field"><label>How are customers solving this right now?</label><div class="field-hint">Competitors? Spreadsheets? They just ignore the problem entirely?</div><textarea id="nv-alternatives" placeholder="e.g. Most restaurants use paper stock lists or WhatsApp messages. Some use expensive ERP systems. Most just accept the waste."></textarea></div>
+        <div class="field"><label>Why would they choose YOU over what they use today? *</label><div class="field-hint">Speed, price, niche focus, unique technology, relationships — what's your edge?</div><textarea id="nv-advantage" placeholder="e.g. We're 10x cheaper than existing ERP systems, built specifically for small restaurants, and takes 10 minutes to set up — not 3 months." required></textarea></div>
+        <div class="form-nav"><button class="btn-back" onclick="nvNav(3,'back')">← Back</button><button class="btn-submit" onclick="nvNav(3,'forward')"><span>Next: First Version</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="nv-s4">
+        <div class="section-title">Your First Version</div>
+        <div class="section-hint">Forget the full vision. What's the smallest, fastest version you could launch to test if people will actually pay?</div>
+        <div class="field"><label>Smallest version launchable in 8 weeks? *</label><textarea id="nv-mvo" placeholder="e.g. A simple WhatsApp-based daily check-in where restaurant owners send stock photos and we send back a weekly waste report. No app yet." required></textarea></div>
+        <div class="field"><label>3 things this version MUST do</label><div class="field-hint">The non-negotiable features of this first version — list one per line.</div><textarea id="nv-features" placeholder="1. Track daily stock levels&#10;2. Send a weekly cost-of-waste report&#10;3. Flag items wasted more than 3x in a week"></textarea></div>
+        <div class="form-nav"><button class="btn-back" onclick="nvNav(4,'back')">← Back</button><button class="btn-submit" onclick="nvNav(4,'forward')"><span>Next: Constraints</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="nv-s5">
+        <div class="section-title">Your Constraints</div>
+        <div class="section-hint">The hard boundaries of this project. Honest answers here lead to better architecture.</div>
+        <div class="field-grid">
+          <div class="field"><label>Maximum Phase 1 Budget (ZAR) *</label><input id="nv-budget" placeholder="e.g. R25,000" required /></div>
+          <div class="field"><label>Launch Deadline *</label><input id="nv-deadline" placeholder="e.g. 1 June 2026" required /></div>
+        </div>
+        <div class="field"><label>What would make this officially viable?</label><div class="field-hint">One specific number — revenue, clients, or time saved — that means "this works."</div><input id="nv-dsm" placeholder="e.g. 10 paying restaurants at R500/month within 90 days of launch" /></div>
+        <div class="form-nav"><button class="btn-back" onclick="nvNav(5,'back')">← Back</button><button class="btn-submit" onclick="nvNav(5,'forward')"><span>Final Step</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="nv-s6">
+        <div class="section-title">The Truth</div>
+        <div class="section-hint">The most important section. This is where architecture gets real.</div>
+        <div class="field"><label>What keeps you up at night about this idea? *</label><div class="field-hint">Your biggest fear, doubt, or obstacle. There's no wrong answer here.</div><textarea id="nv-worry" placeholder="e.g. I'm worried nobody will pay because they think they can just use a spreadsheet. Or that I'll build it and not know how to sell it." required></textarea></div>
+        <div class="field"><label>Anything else we should know?</label><textarea id="nv-extra" placeholder="Partnerships, IP, unique context, regulatory considerations, personal constraints..."></textarea></div>
+        <div class="privacy-note">🔒 Your information is processed in a <strong>POPIA-compliant, confidential environment</strong>. It will only be used to prepare your strategic blueprint. By submitting, you consent to Aptiv Consulting contacting you to arrange your discovery session.</div>
+        <div class="form-nav"><button class="btn-back" onclick="nvNav(6,'back')">← Back</button><button class="btn-submit" id="btnSubmitNV" onclick="submitForm('new')"><span>Submit My Blueprint Request</span><span>-></span></button></div>
+      </div>
+    </div>
+
+    <!-- EXISTING BUSINESS FORM -->
+    <div class="form-body" id="formExisting">
+      <div class="progress-label" id="exProgressLabel">Section 1 of 5</div>
+      <div class="form-progress" id="exProgressBar"></div>
+
+      <div class="form-section active" id="ex-s1">
+        <div class="section-title">Your Business Basics</div>
+        <div class="section-hint">Let's start with the fundamentals of your current operation.</div>
+        <div class="field"><label>Your Full Name *</label><input id="ex-name" placeholder="Your name" required /></div>
+        <div class="field"><label>Your Email Address *</label><input type="email" id="ex-email" placeholder="you@yourbusiness.com" required /></div>
+        <div class="field-grid">
+          <div class="field"><label>Business Name *</label><input id="ex-bizname" placeholder="Registered business name" required /></div>
+          <div class="field"><label>CIPC Registration No.</label><input id="ex-cipc" placeholder="e.g. 2021/123456/07" /></div>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label>Monthly Revenue (ZAR)</label><input id="ex-revenue" placeholder="e.g. R85,000/month" /></div>
+          <div class="field"><label>Years in Operation</label><input id="ex-years" placeholder="e.g. 3 years" /></div>
+        </div>
+        <div class="field"><label>Current Team Size</label><input id="ex-team" placeholder="e.g. 6 full-time, 2 part-time" /></div>
+        <div class="form-nav"><span></span><button class="btn-submit" onclick="exNav(1,'forward')"><span>Next: The Diagnosis</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="ex-s2">
+        <div class="section-title">The Diagnosis</div>
+        <div class="section-hint">Why are you seeking strategic help right now? Be direct — vague inputs produce vague blueprints.</div>
+        <div class="field"><label>Where is your business stuck? *</label><select id="ex-stuckType"><option value="">Select your primary challenge...</option><option>Revenue plateau — growth has stalled</option><option>High client churn — losing customers too fast</option><option>Operational chaos — can't run without me</option><option>Funding — I need capital to scale</option><option>Market repositioning — original model isn't working</option><option>Other (describe below)</option></select></div>
+        <div class="field"><label>Describe the situation *</label><div class="field-hint">What's actually happening? The more specific, the better the architecture.</div><textarea id="ex-stuck" placeholder="e.g. We've been stuck at R80K/month for 8 months. Losing clients after month 3 and I don't know why. I'm working 70-hour weeks and still feel behind." required></textarea></div>
+        <div class="field"><label>What is this costing you monthly?</label><div class="field-hint">In lost revenue, wasted time, or missed opportunities — estimate it.</div><input id="ex-cost" placeholder="e.g. Approximately R40,000/month in lost potential revenue" /></div>
+        <div class="field"><label>If you're pivoting — what's the new direction?</label><div class="field-hint">Leave blank if you're not changing your market.</div><textarea id="ex-pivot" placeholder="e.g. We started as a B2C delivery service but want to move to B2B logistics for SMEs in Gauteng."></textarea></div>
+        <div class="form-nav"><button class="btn-back" onclick="exNav(2,'back')">← Back</button><button class="btn-submit" onclick="exNav(2,'forward')"><span>Next: Financials</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="ex-s3">
+        <div class="section-title">Financial & Funding Picture</div>
+        <div class="section-hint">Honest numbers here. If you don't know a figure, write "Unknown" — that itself is useful data.</div>
+        <div class="field"><label>Are you seeking external funding?</label><select id="ex-fundingYN"><option value="">Select...</option><option>Yes — actively seeking capital now</option><option>Yes — planning to raise in the next 6 months</option><option>No — we're self-funding</option><option>Unsure — open to exploring options</option></select></div>
+        <div class="field"><label>How much capital do you need? (ZAR)</label><div class="field-hint">And what would it be used for specifically?</div><textarea id="ex-fundingAmt" placeholder="e.g. R500,000 — R200K for tech, R200K for marketing, R100K for 2 staff for 6 months."></textarea></div>
+        <div class="field-grid">
+          <div class="field"><label>Cost to Acquire 1 Customer (CAC)</label><div class="field-hint">How much do you spend to get one paying client?</div><input id="ex-cac" placeholder="e.g. R1,200 or Unknown" /></div>
+          <div class="field"><label>Lifetime Value of 1 Customer (LTV)</label><div class="field-hint">Total revenue one client generates over time.</div><input id="ex-ltv" placeholder="e.g. R18,000 or Unknown" /></div>
+        </div>
+        <div class="form-nav"><button class="btn-back" onclick="exNav(3,'back')">← Back</button><button class="btn-submit" onclick="exNav(3,'forward')"><span>Next: Operations</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="ex-s4">
+        <div class="section-title">Operational Architecture</div>
+        <div class="section-hint">We need to know where your growth ceiling lives before we design the next level.</div>
+        <div class="field"><label>If your volume tripled tomorrow, what breaks first? *</label><div class="field-hint">Which person, system, or process collapses under that pressure?</div><textarea id="ex-bottleneck" placeholder="e.g. Our onboarding — it's fully manual and I handle every new client personally. We'd immediately fall behind." required></textarea></div>
+        <div class="field"><label>What tools do you use to run the business?</label><div class="field-hint">CRM, accounting, payments, project management, comms...</div><textarea id="ex-tech" placeholder="e.g. QuickBooks for accounting, WhatsApp for client comms, Google Sheets for tracking, Yoco for payments. No CRM."></textarea></div>
+        <div class="form-nav"><button class="btn-back" onclick="exNav(4,'back')">← Back</button><button class="btn-submit" onclick="exNav(4,'forward')"><span>Final Step</span><span>-></span></button></div>
+      </div>
+
+      <div class="form-section" id="ex-s5">
+        <div class="section-title">Your Strategic Ask</div>
+        <div class="section-hint">What do you actually need from this engagement? We'll build your discovery session around your answer.</div>
+        <div class="field"><label>What does success look like in 6 months? *</label><div class="field-hint">A number, milestone, or state of operation that means "we made it."</div><textarea id="ex-northstar" placeholder="e.g. R250K/month revenue, 3 enterprise clients, and a business that runs without me being physically present every day." required></textarea></div>
+        <div class="field"><label>The one question you need Neal Titus to answer *</label><div class="field-hint">If you had 45 focused minutes with a venture architect, what's the single most important thing you need resolved?</div><textarea id="ex-question" placeholder="e.g. How do I transition from individual clients to corporates, without losing my existing revenue while I make that shift?" required></textarea></div>
+        <div class="field"><label>Anything else we should know?</label><textarea id="ex-extra" placeholder="Context, constraints, partnerships, competitive threats, regulatory concerns..."></textarea></div>
+        <div class="privacy-note">🔒 Your information is processed in a <strong>POPIA-compliant, confidential environment</strong>. It will only be used to prepare your strategic blueprint. By submitting, you consent to Aptiv Consulting contacting you to arrange your discovery session.</div>
+        <div class="form-nav"><button class="btn-back" onclick="exNav(5,'back')">← Back</button><button class="btn-submit" id="btnSubmitEx" onclick="submitForm('existing')"><span>Submit My Blueprint Request</span><span>-></span></button></div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="form-success" id="formSuccess">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Blueprint Request Received</div>
+      <p class="success-text">Your intake has been submitted to the Aptiv Consulting team. Archie is already analysing your venture architecture. <strong style="color:var(--white)">Expect a response within 24 hours</strong> to schedule your discovery session.</p>
+      <button class="btn-submit" onclick="closeModal()" style="margin:0 auto;"><span>Close</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- SITE -->
+<header id="header">
+  <a href="#" class="logo">
+    <div class="logo-mark"><span>A</span></div>
+    <div class="logo-text"><span class="brand">APTIV CONSULTING</span><span class="tagline">Venture Architecture</span></div>
+  </a>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#alpha">Alpha 10</a>
+    <a href="#testimonials">Testimonials</a>
+    <button class="nav-cta" onclick="openModal()">Engage Us</button>
+  </nav>
+</header>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines">
+    <svg viewBox="0 0 600 900" preserveAspectRatio="xMidYMid slice">
+      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#C9922A;stop-opacity:1"/><stop offset="100%" style="stop-color:#C9922A;stop-opacity:0"/></linearGradient></defs>
+      <rect x="100" y="150" width="320" height="220" fill="none" stroke="url(#lg)" stroke-width=".8"/>
+      <rect x="140" y="190" width="240" height="140" fill="none" stroke="url(#lg)" stroke-width=".5"/>
+      <line x1="100" y1="150" x2="60" y2="100" stroke="url(#lg)" stroke-width=".5"/>
+      <line x1="420" y1="150" x2="480" y2="100" stroke="url(#lg)" stroke-width=".5"/>
+      <line x1="60" y1="100" x2="480" y2="100" stroke="url(#lg)" stroke-width=".5"/>
+      <line x1="480" y1="100" x2="480" y2="320" stroke="url(#lg)" stroke-width=".5"/>
+      <line x1="420" y1="370" x2="480" y2="320" stroke="url(#lg)" stroke-width=".5"/>
+      <line x1="100" y1="220" x2="420" y2="220" stroke="url(#lg)" stroke-width=".3"/>
+      <line x1="100" y1="290" x2="420" y2="290" stroke="url(#lg)" stroke-width=".3"/>
+      <line x1="200" y1="150" x2="200" y2="370" stroke="url(#lg)" stroke-width=".3"/>
+      <line x1="320" y1="150" x2="320" y2="370" stroke="url(#lg)" stroke-width=".3"/>
+      <rect x="140" y="420" width="240" height="180" fill="none" stroke="url(#lg)" stroke-width=".6"/>
+      <line x1="140" y1="460" x2="380" y2="460" stroke="url(#lg)" stroke-width=".3"/>
+      <line x1="140" y1="520" x2="380" y2="520" stroke="url(#lg)" stroke-width=".3"/>
+      <line x1="260" y1="420" x2="260" y2="600" stroke="url(#lg)" stroke-width=".3"/>
+      <circle cx="260" cy="260" r="40" fill="none" stroke="url(#lg)" stroke-width=".8"/>
+      <circle cx="260" cy="260" r="28" fill="none" stroke="url(#lg)" stroke-width=".5"/>
+      <circle cx="260" cy="260" r="8" fill="none" stroke="url(#lg)" stroke-width="1"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><div class="eyebrow-line"></div><span>Johannesburg, South Africa · Est. 2025</span></div>
+    <h1>Architectural<br><em>Rigor.</em><br>Not Motivational Advice.</h1>
+    <p class="hero-sub">We translate your venture thesis into structured, executable blueprints. No shelf-ware. No generic strategy decks. Pure architectural precision — from idea to funded roadmap.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openModal()"><span>Start Your Blueprint</span><span>-></span></button>
+      <a href="#services" class="btn-secondary">Explore Services <span>-></span></a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-number">α10</div><div class="stat-label">Founding Tier</div></div>
+    <div class="stat"><div class="stat-number">100%</div><div class="stat-label">Compliance Focused</div></div>
+    <div class="stat"><div class="stat-number">3</div><div class="stat-label">Continents Served</div></div>
+  </div>
+</section>
+
+<div class="marquee-strip"><div class="marquee-track">
+  <div class="marquee-item">Venture Architecture <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Strategic Blueprints <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Risk Mitigation <span class="marquee-dot"></span></div>
+  <div class="marquee-item">AI-Powered Strategy <span class="marquee-dot"></span></div>
+  <div class="marquee-item">From Idea to Roadmap <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Pan-African Innovation <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Funding Architecture <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Venture Architecture <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Strategic Blueprints <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Risk Mitigation <span class="marquee-dot"></span></div>
+  <div class="marquee-item">AI-Powered Strategy <span class="marquee-dot"></span></div>
+  <div class="marquee-item">From Idea to Roadmap <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Pan-African Innovation <span class="marquee-dot"></span></div>
+  <div class="marquee-item">Funding Architecture <span class="marquee-dot"></span></div>
+</div></div>
+
+<section id="about">
+  <div class="section-inner">
+    <div class="section-label reveal"><span>Who We Are</span><div class="line"></div></div>
+    <div class="about-grid">
+      <div class="about-left">
+        <h2 class="reveal">We Build the<br><em>Infrastructure</em><br>of Great Ventures</h2>
+        <p class="about-desc reveal reveal-delay-1">Aptiv Consulting is a <strong>venture architecture firm</strong> operating at the intersection of AI, strategy, and African business innovation. We work with founders who need more than motivation — they need structure.</p>
+        <p class="about-desc reveal reveal-delay-2">Our AI-powered Lead Architect, <strong>Archie</strong>, applies rigorous diagnostic frameworks to every engagement — producing Blueprints, Roadmaps, Budget Architectures, and Execution Guides that move ventures from thesis to market-ready reality.</p>
+        <p class="about-desc reveal reveal-delay-2">We operate across South Africa, East Africa, and the broader continent — building for founders who understand that <strong>intent without infrastructure is a liability.</strong></p>
+        <div class="about-signature reveal reveal-delay-3">
+          <div class="sig-mark">N</div>
+          <div class="sig-info"><div class="sig-name">Neal Titus</div><div class="sig-role">Founder · Lead Venture Architect</div></div>
+        </div>
+      </div>
+      <div class="about-right reveal">
+        <div class="pillar"><div class="pillar-num">01</div><div class="pillar-title">Diagnostic Precision</div><div class="pillar-desc">We dissect your venture thesis before prescribing architecture. Every engagement begins with a structured discovery process.</div></div>
+        <div class="pillar"><div class="pillar-num">02</div><div class="pillar-title">AI-Augmented Delivery</div><div class="pillar-desc">Archie, our AI Venture Architect, operates as your always-on strategic co-pilot — available 24 hours, rigorous every time.</div></div>
+        <div class="pillar"><div class="pillar-num">03</div><div class="pillar-title">Pan-African Scope</div><div class="pillar-desc">We build for the continent — integrating regulatory intelligence from SA, Kenya, Nigeria, Rwanda, and Senegal.</div></div>
+        <div class="pillar"><div class="pillar-num">04</div><div class="pillar-title">Grant-Ready Architecture</div><div class="pillar-desc">Every blueprint is built to 100% compliance standards — ensuring you remain fundable by government and international ESG bodies.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="section-inner">
+    <div class="section-label reveal"><span>What We Build</span><div class="line"></div></div>
+    <div class="services-header">
+      <h2 class="reveal">Services Built for<br><em>Founders Who Execute</em></h2>
+      <p class="services-intro reveal reveal-delay-1">Three core engagements. Each designed to eliminate guesswork, de-risk the build, and accelerate the path from idea to funded, operational venture.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal" onclick="openModal()">
+        <div class="service-num">01</div>
+        <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="service-title">From Idea to Roadmap</div>
+        <div class="service-desc">Our flagship engagement. Executive Summary, Strategic Roadmap, Budget Architecture, and Execution Guide — built with architectural precision.</div>
+        <button class="service-link">Start This Engagement -></button>
+      </div>
+      <div class="service-card reveal reveal-delay-1" onclick="openModal()">
+        <div class="service-num">02</div>
+        <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="service-title">Risk Mitigation Architecture</div>
+        <div class="service-desc">We identify the failure vectors in your model before the market does. Regulatory exposure, funding gaps, operational blind spots — mapped and neutralised.</div>
+        <button class="service-link">Start This Engagement -></button>
+      </div>
+      <div class="service-card reveal reveal-delay-2" onclick="openModal()">
+        <div class="service-num">03</div>
+        <div class="service-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/><path d="M15.54 8.46a5 5 0 010 7.07M8.46 8.46a5 5 0 000 7.07"/></svg></div>
+        <div class="service-title">DSM Venture Guardian</div>
+        <div class="service-desc">Monthly diagnostic monitoring. Archie audits your KPIs, flags deviations from your blueprint, and keeps your revenue targets mathematically intact.</div>
+        <button class="service-link">Start This Engagement -></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="alpha">
+  <div class="section-inner">
+    <div class="section-label reveal"><span>Founding Tier</span><div class="line"></div></div>
+    <div class="alpha-inner">
+      <div class="alpha-left">
+        <div class="alpha-badge reveal"><div class="alpha-dot"></div><span>Currently Accepting Applications</span></div>
+        <h2 class="reveal">The Alpha <em>10</em><br>Programme</h2>
+        <p class="reveal reveal-delay-1">The Alpha 10 is our founding client tier — limited to the first ten ventures we architect. High-touch, validation-first, where we prioritise your blueprint quality over our margin.</p>
+        <p class="reveal reveal-delay-1">As an Alpha 10 client, you receive direct access to Neal Titus and the full Archie architecture engine. You are not a ticket in a queue — you are a founding partner in our portfolio.</p>
+        <div class="alpha-price reveal reveal-delay-2">
+          <span class="price-currency">R</span>
+          <span class="price-amount">1,500</span>
+          <div><span class="price-period">/ month</span><br><span class="price-note">Alpha 10 Founding Rate · Limited Slots</span></div>
+        </div>
+        <button class="btn-primary reveal reveal-delay-3" onclick="openModal()"><span>Apply for Alpha 10</span><span>-></span></button>
+      </div>
+      <div class="alpha-right reveal reveal-delay-1">
+        <div class="deliverable"><div class="del-check"></div><div><div class="del-title">Executive Summary</div><div class="del-desc">A precision document capturing your venture's strategic DNA — market context, value proposition, and competitive positioning.</div></div></div>
+        <div class="deliverable"><div class="del-check"></div><div><div class="del-title">Strategic Roadmap</div><div class="del-desc">Phased execution plan with milestones, dependencies, and decision gates — built to survive first contact with the market.</div></div></div>
+        <div class="deliverable"><div class="del-check"></div><div><div class="del-title">Budget Architecture</div><div class="del-desc">Capital and operational expenditure breakdown with Build vs. Run logic. Conservative, auditable, and investor-ready.</div></div></div>
+        <div class="deliverable"><div class="del-check"></div><div><div class="del-title">Execution Guide</div><div class="del-desc">72-hour action plan plus a grant-readiness checklist for SEDA, DTIC, and international ESG funding bodies.</div></div></div>
+        <div class="deliverable"><div class="del-check"></div><div><div class="del-title">One Free Redraft</div><div class="del-desc">After your review call, one full architectural redraft to incorporate pivots, expansions, or market corrections.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="section-inner">
+    <div class="section-label reveal"><span>Client Voices</span><div class="line"></div></div>
+    <div class="testimonials-header">
+      <h2 class="reveal">What Founders<br><em>Say After the Blueprint</em></h2>
+      <p class="reveal reveal-delay-1">From the Alpha 10 cohort — real feedback from real ventures.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card featured reveal">
+        <div class="stars">★★★★★</div>
+        <span class="quote-mark">"</span>
+        <p class="testimonial-text">This is super helpful! The blueprint gave GendeRise direction we simply did not have before. The architectural rigor moved us from a thesis to a structured, diagnostic-to-action engine.</p>
+        <div class="testimonial-author"><div class="author-avatar">K</div><div><div class="author-name">Khetsiwe Dlamini</div><div class="author-title">Founder, GendeRise · Triple C Ltd</div></div></div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="stars">★★★★★</div>
+        <span class="quote-mark">"</span>
+        <p class="testimonial-text">The level of thinking Archie brought to Africa Tool CC was unlike anything I expected. It wasn't just strategy — it was a complete architectural system for how we operate and grow.</p>
+        <div class="testimonial-author"><div class="author-avatar">L</div><div><div class="author-name">Louis Karrim</div><div class="author-title">Owner, Africa Tool CC</div></div></div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="stars">★★★★★</div>
+        <span class="quote-mark">"</span>
+        <p class="testimonial-text">I went from feeling overwhelmed about where to start, to having four documents with a clear, confident path forward. The Alpha 10 rate made it accessible. The value was beyond the price.</p>
+        <div class="testimonial-author"><div class="author-avatar">C</div><div><div class="author-name">Charmaine Kambaran</div><div class="author-title">Founder, Independent Venture</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-inner">
+    <div class="contact-inner">
+      <div class="section-label reveal" style="justify-content:center"><span>Start the Process</span></div>
+      <h2 class="reveal">Your Venture<br>Deserves a <em>Blueprint</em></h2>
+      <p class="reveal reveal-delay-1">Stop operating from intent alone. Submit your intake and let Archie apply the architectural rigor your venture requires to move from vision to funded reality.</p>
+      <div class="contact-actions reveal reveal-delay-2">
+        <button class="btn-primary" onclick="openModal()"><span>Book a Discovery Call</span><span>-></span></button>
+        <button class="btn-secondary" onclick="openModal()">Apply for Alpha 10 <span>-></span></button>
+      </div>
+      <span class="contact-email reveal reveal-delay-3">Email: <a href="/cdn-cgi/l/email-protection#92fcf7f3fee6fbe6e7e1d2f3e2e6fbe4f1fdfce1e7fee6fbfcf5bcf1fdff"><span class="__cf_email__" data-cfemail="f49a919598809d808187b49584809d82979b9a878198809d9a93da979b99">[email&#160;protected]</span></a> &nbsp;·&nbsp; WhatsApp: <a href="https://wa.me/27670062765" target="_blank" rel="noopener">067 006 2765</a></span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo">
+        <div class="logo-mark"><span>A</span></div>
+        <div class="logo-text"><span class="brand">APTIV CONSULTING</span><span class="tagline">Venture Architecture</span></div>
+      </a>
+      <p>Architectural rigor for Africa's next generation of founders. We build the infrastructure of great ventures — from idea to fundable reality.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#services">Idea to Roadmap</a></li>
+        <li><a href="#services">Risk Mitigation</a></li>
+        <li><a href="#services">DSM Venture Guardian</a></li>
+        <li><a href="#alpha">Alpha 10 Programme</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#about">About Aptiv</a></li>
+        <li><a href="#about">Meet Archie</a></li>
+        <li><a href="#testimonials">Client Stories</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="/cdn-cgi/l/email-protection#c4aaa1a5a8b0adb0b1b784a5b4b0adb2a7abaab7b1a8b0adaaa3eaa7aba9">Email Us</a></li>
+        <li><a href="https://www.linkedin.com/company/aptiv-consulting" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://wa.me/27670062765" target="_blank" rel="noopener">WhatsApp</a></li>
+        <li><a href="#" onclick="openModal();return false;">Book a Call</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Aptiv Consulting · Johannesburg, South Africa · <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0b656e6a677f627f7e784b6a7b7f627d686465787e677f62656c25686466">[email&#160;protected]</a></span></p>
+    <p style="font-size:11px;color:var(--grey);">Architectural Rigor. Not Motivational Advice.</p>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* Cursor */
+var ring=document.getElementById('cursorRing');
+var dot=document.getElementById('cursorDot');
+var mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+function animCursor(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animCursor);}
+animCursor();
+document.querySelectorAll('a,button,.service-card,.pillar').forEach(function(el){
+  el.addEventListener('mouseenter',function(){ring.style.width='52px';ring.style.height='52px';ring.style.borderColor='rgba(201,146,42,0.8)';});
+  el.addEventListener('mouseleave',function(){ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(201,146,42,0.5)';});
+});
+
+/* Header scroll */
+window.addEventListener('scroll',function(){
+  document.getElementById('header').classList.toggle('scrolled',window.scrollY>60);
+});
+
+/* Scroll reveal */
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
+
+/* Modal state */
+var selType='new';
+var nvStep=1;
+var exStep=1;
+var NV_TOTAL=6;
+var EX_TOTAL=5;
+
+function openModal(){
+  document.getElementById('intakeModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  resetModal();
+}
+function closeModal(){
+  document.getElementById('intakeModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('intakeModal').addEventListener('click',function(e){
+  if(e.target.id==='intakeModal'){closeModal();}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){closeModal();}
+});
+
+function resetModal(){
+  selType='new'; nvStep=1; exStep=1;
+  document.getElementById('stepType').style.display='';
+  document.getElementById('formNewVenture').classList.remove('visible');
+  document.getElementById('formExisting').classList.remove('visible');
+  document.getElementById('formSuccess').classList.remove('visible');
+  document.querySelectorAll('.form-section').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('nv-s1').classList.add('active');
+  document.getElementById('ex-s1').classList.add('active');
+  document.getElementById('btnNewVenture').classList.add('active');
+  document.getElementById('btnExisting').classList.remove('active');
+}
+
+function selectType(t){
+  selType=t;
+  document.getElementById('btnNewVenture').classList.toggle('active',t==='new');
+  document.getElementById('btnExisting').classList.toggle('active',t==='existing');
+}
+
+function startForm(){
+  document.getElementById('stepType').style.display='none';
+  if(selType==='new'){
+    document.getElementById('formNewVenture').classList.add('visible');
+    buildProg('nvProgressBar','nvProgressLabel',NV_TOTAL,1);
+  } else {
+    document.getElementById('formExisting').classList.add('visible');
+    buildProg('exProgressBar','exProgressLabel',EX_TOTAL,1);
+  }
+}
+
+function buildProg(barId,lblId,total,cur){
+  var bar=document.getElementById(barId);
+  bar.innerHTML='';
+  for(var i=1;i<=total;i++){
+    var s=document.createElement('div');
+    s.className='progress-step'+(i<=cur?' done':'');
+    bar.appendChild(s);
+  }
+  document.getElementById(lblId).textContent='Section '+cur+' of '+total;
+}
+
+function validate(secId){
+  var fields=document.querySelectorAll('#'+secId+' [required]');
+  for(var i=0;i<fields.length;i++){
+    if(!fields[i].value.trim()){
+      fields[i].focus();
+      fields[i].style.borderColor='#E8B84B';
+      setTimeout((function(f){return function(){f.style.borderColor='';};})(fields[i]),2000);
+      return false;
+    }
+  }
+  return true;
+}
+
+function nvNav(from,dir){
+  if(dir==='forward' && !validate('nv-s'+from)){return;}
+  document.getElementById('nv-s'+from).classList.remove('active');
+  nvStep=(dir==='forward')?from+1:from-1;
+  document.getElementById('nv-s'+nvStep).classList.add('active');
+  buildProg('nvProgressBar','nvProgressLabel',NV_TOTAL,nvStep);
+  document.querySelector('.modal').scrollTop=0;
+}
+
+function exNav(from,dir){
+  if(dir==='forward' && !validate('ex-s'+from)){return;}
+  document.getElementById('ex-s'+from).classList.remove('active');
+  exStep=(dir==='forward')?from+1:from-1;
+  document.getElementById('ex-s'+exStep).classList.add('active');
+  buildProg('exProgressBar','exProgressLabel',EX_TOTAL,exStep);
+  document.querySelector('.modal').scrollTop=0;
+}
+
+function gv(id){
+  var el=document.getElementById(id);
+  return el ? el.value : '';
+}
+
+function submitForm(type){
+  var btnId=(type==='new')?'btnSubmitNV':'btnSubmitEx';
+  var btn=document.getElementById(btnId);
+  btn.disabled=true;
+  btn.querySelector('span').textContent='Sending...';
+
+  /* Build hidden native form and POST directly - works on all browsers/hosts */
+  var fields={};
+  if(type==='new'){
+    fields['_subject']='[APTIV LEAD] New Venture - '+gv('nv-name');
+    fields['_replyto']=gv('nv-email');
+    fields['_template']='table';
+    fields['venture_type']='New Venture';
+    fields['full_name']=gv('nv-name');
+    fields['email']=gv('nv-email');
+    fields['profession']=gv('nv-profession');
+    fields['linkedin']=gv('nv-linkedin');
+    fields['prior_experience']=gv('nv-experience');
+    fields['elevator_pitch']=gv('nv-pitch');
+    fields['quantified_pain']=gv('nv-pain');
+    fields['target_niche']=gv('nv-target');
+    fields['current_alternatives']=gv('nv-alternatives');
+    fields['unfair_advantage']=gv('nv-advantage');
+    fields['minimum_viable_offering']=gv('nv-mvo');
+    fields['core_features']=gv('nv-features');
+    fields['budget_cap']=gv('nv-budget');
+    fields['launch_deadline']=gv('nv-deadline');
+    fields['success_metric']=gv('nv-dsm');
+    fields['biggest_worry']=gv('nv-worry');
+    fields['additional_context']=gv('nv-extra');
+  } else {
+    fields['_subject']='[APTIV LEAD] Existing Business - '+gv('ex-name');
+    fields['_replyto']=gv('ex-email');
+    fields['_template']='table';
+    fields['venture_type']='Existing Business';
+    fields['full_name']=gv('ex-name');
+    fields['email']=gv('ex-email');
+    fields['business_name']=gv('ex-bizname');
+    fields['cipc']=gv('ex-cipc');
+    fields['monthly_revenue']=gv('ex-revenue');
+    fields['years_operating']=gv('ex-years');
+    fields['team_size']=gv('ex-team');
+    fields['stuck_type']=gv('ex-stuckType');
+    fields['situation_detail']=gv('ex-stuck');
+    fields['monthly_cost']=gv('ex-cost');
+    fields['pivot_thesis']=gv('ex-pivot');
+    fields['funding_status']=gv('ex-fundingYN');
+    fields['funding_amount_use']=gv('ex-fundingAmt');
+    fields['cac']=gv('ex-cac');
+    fields['ltv']=gv('ex-ltv');
+    fields['operational_bottleneck']=gv('ex-bottleneck');
+    fields['tech_stack']=gv('ex-tech');
+    fields['north_star']=gv('ex-northstar');
+    fields['key_question']=gv('ex-question');
+    fields['additional_context']=gv('ex-extra');
+  }
+
+  /* Create and submit a real HTML form */
+  var form=document.createElement('form');
+  form.method='POST';
+  form.action='https://formsubmit.co/nealtitus@aptivconsulting.com';
+  form.style.display='none';
+
+  /* Formsubmit special fields */
+  var noCaptha=document.createElement('input');
+  noCaptha.type='hidden'; noCaptha.name='_captcha'; noCaptha.value='false';
+  form.appendChild(noCaptha);
+
+  var noNext=document.createElement('input');
+  noNext.type='hidden'; noNext.name='_next'; noNext.value=window.location.href+'?submitted=1';
+  form.appendChild(noNext);
+
+  for(var key in fields){
+    var inp=document.createElement('input');
+    inp.type='hidden';
+    inp.name=key;
+    inp.value=fields[key]||'';
+    form.appendChild(inp);
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function showSuccess(){
+  document.getElementById('formNewVenture').classList.remove('visible');
+  document.getElementById('formExisting').classList.remove('visible');
+  document.getElementById('stepType').style.display='none';
+  document.getElementById('formSuccess').classList.add('visible');
+}
+
+/* Expose to global scope for inline onclick */
+window.openModal=openModal;
+window.closeModal=closeModal;
+window.selectType=selectType;
+window.startForm=startForm;
+window.nvNav=nvNav;
+window.exNav=exNav;
+window.submitForm=submitForm;
+window.showSuccess=showSuccess;
+
+/* Auto-trigger success modal if redirected back with ?submitted=1 */
+window.addEventListener('DOMContentLoaded', function(){
+  if(window.location.search.indexOf('submitted=1') !== -1){
+    openModal();
+    showSuccess();
+    history.replaceState(null, '', window.location.pathname);
+  }
+});
+</script>
+</body>
+</html>
